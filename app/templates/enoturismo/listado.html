@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block titulo %}Enoturismo - La Venta de las Estrellas{% endblock %}
+
+{% block contenido %}
+<div class="container py-5">
+    <h1 class="mb-2">Enoturismo</h1>
+    <p class="lead text-muted mb-4">Descubre el vino natural de Valdepeñas en La Bodega de las Estrellas.</p>
+
+    <div class="row g-4">
+        {% for exp in experiencias %}
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h4 class="card-title">{{ exp.nombre }}</h4>
+                    <p class="card-text">{{ exp.descripcion }}</p>
+
+                    <ul class="list-unstyled text-muted">
+                        {% if exp.duracion_minutos %}
+                        <li><i class="bi bi-clock"></i> {{ exp.duracion_minutos }} minutos</li>
+                        {% endif %}
+                        {% if exp.dia_semana %}
+                        <li><i class="bi bi-calendar"></i> {{ exp.dia_semana | capitalize }}s a las {{ exp.hora }}</li>
+                        {% endif %}
+                        <li><i class="bi bi-people"></i> Máximo {{ exp.plazas_max }} personas</li>
+                    </ul>
+
+                    <p class="fs-4 fw-bold mb-1">{{ '%.0f' % exp.precio }} &euro;<small class="text-muted fw-normal fs-6">/persona</small></p>
+                    {% if exp.precio_alojado %}
+                    <p class="text-success small">{{ '%.0f' % exp.precio_alojado }} &euro; para alojados</p>
+                    {% endif %}
+                </div>
+                <div class="card-footer bg-transparent">
+                    <!-- Formulario de reserva rápida -->
+                    <form method="POST" action="{{ url_for('enoturismo.reservar', experiencia_id=exp.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                        <div class="row g-2 mb-2">
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control form-control-sm" name="nombre" placeholder="Nombre" required>
+                            </div>
+                            <div class="col-sm-6">
+                                <input type="email" class="form-control form-control-sm" name="email" placeholder="Email" required>
+                            </div>
+                        </div>
+                        <div class="row g-2 mb-2">
+                            <div class="col-sm-4">
+                                <input type="tel" class="form-control form-control-sm" name="telefono" placeholder="Teléfono" required>
+                            </div>
+                            <div class="col-sm-4">
+                                <input type="date" class="form-control form-control-sm" name="fecha" required>
+                            </div>
+                            <div class="col-sm-4">
+                                <input type="number" class="form-control form-control-sm" name="num_personas" value="2" min="1" max="{{ exp.plazas_max }}" placeholder="Personas">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-dark btn-sm w-100">Reservar experiencia</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                Próximamente publicaremos nuestras experiencias de enoturismo.
+                Mientras tanto, puedes llamarnos al <a href="tel:+34641116078">+34 641 116 078</a>.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

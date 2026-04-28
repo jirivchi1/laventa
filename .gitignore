@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+*.so
+.env
+*.db
+instance/
+venv/
+.venv/
+dist/
+build/
+*.egg-info/
+.vscode/
+.idea/
+.claude/
+Isma.txt

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block titulo %}{{ propiedad.nombre }} - La Venta de las Estrellas{% endblock %}
+
+{% block contenido %}
+<div class="container py-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('propiedades.listado') }}">Alojamientos</a></li>
+            <li class="breadcrumb-item active">{{ propiedad.nombre }}</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+        <!-- Info -->
+        <div class="col-md-7">
+            <h1>{{ propiedad.nombre }}</h1>
+            <p class="text-muted">
+                <i class="bi bi-people"></i> Hasta {{ propiedad.capacidad }} personas
+                &middot;
+                <span class="badge bg-secondary">{{ propiedad.tipo | capitalize }}</span>
+            </p>
+
+            <p class="fs-5">{{ propiedad.descripcion }}</p>
+
+            {% if propiedad.caracteristicas %}
+            <h4 class="mt-4">Características</h4>
+            <ul class="list-group list-group-flush">
+                {% for caract in propiedad.caracteristicas.split(',') %}
+                <li class="list-group-item">
+                    <i class="bi bi-check-lg text-success"></i> {{ caract.strip() }}
+                </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+
+        <!-- Reserva -->
+        <div class="col-md-5">
+            <div class="card sticky-top" style="top: 1rem;">
+                <div class="card-body">
+                    <p class="fs-3 fw-bold mb-1">{{ '%.0f' % propiedad.precio_noche }} &euro;<small class="text-muted fw-normal fs-6">/noche</small></p>
+
+                    <a href="{{ url_for('reservas.nueva', propiedad_id=propiedad.id) }}" class="btn btn-dark btn-lg w-100 mt-3">
+                        Reservar ahora
+                    </a>
+
+                    <hr>
+
+                    <p class="text-muted small mb-1">
+                        <i class="bi bi-telephone"></i> ¿Prefieres llamar?
+                    </p>
+                    <a href="tel:+34641116078" class="text-decoration-none">+34 641 116 078</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

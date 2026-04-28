@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block titulo %}Reservar {{ propiedad.nombre }} - La Venta de las Estrellas{% endblock %}
+
+{% block head_extra %}
+<!-- FullCalendar para mostrar disponibilidad -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block contenido %}
+<div class="container py-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('propiedades.listado') }}">Alojamientos</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('propiedades.detalle', slug=propiedad.slug) }}">{{ propiedad.nombre }}</a></li>
+            <li class="breadcrumb-item active">Reservar</li>
+        </ol>
+    </nav>
+
+    <h1 class="mb-4">Reservar {{ propiedad.nombre }}</h1>
+
+    <div class="row g-4">
+        <!-- Calendario de disponibilidad -->
+        <div class="col-md-7">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Disponibilidad</h5>
+                </div>
+                <div class="card-body">
+                    <div id="calendario"></div>
+                    <p class="text-muted small mt-2">
+                        <span class="badge bg-danger">&nbsp;</span> Fechas ocupadas
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulario de reserva -->
+        <div class="col-md-5">
+            <div class="card sticky-top" style="top: 1rem;">
+                <div class="card-header">
+                    <h5 class="mb-0">Datos de la reserva</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('reservas.nueva', propiedad_id=propiedad.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                        <div class="mb-3">
+                            <label for="nombre" class="form-label">Nombre completo *</label>
+                            <input type="text" class="form-control" id="nombre" name="nombre" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email *</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="telefono" class="form-label">Teléfono *</label>
+                            <input type="tel" class="form-control" id="telefono" name="telefono" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="num_personas" class="form-label">Número de personas *</label>
+                            <input type="number" class="form-control" id="num_personas" name="num_personas"
+                                   min="1" max="{{ propiedad.capacidad }}" value="2" required>
+                            <div class="form-text">Máximo {{ propiedad.capacidad }} personas</div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <label for="fecha_entrada" class="form-label">Entrada *</label>
+                                <input type="date" class="form-control" id="fecha_entrada" name="fecha_entrada" required>
+                            </div>
+                            <div class="col-6">
+                                <label for="fecha_salida" class="form-label">Salida *</label>
+                                <input type="date" class="form-control" id="fecha_salida" name="fecha_salida" required>
+                            </div>
+                        </div>
+
+                        <!-- Precio estimado -->
+                        <div class="alert alert-light" id="precio-estimado" style="display:none;">
+                            <strong>Precio estimado:</strong>
+                            <span id="precio-valor"></span>
+                            (<span id="num-noches"></span> noches x {{ '%.0f' % propiedad.precio_noche }} &euro;)
+                        </div>
+
+                        <button type="submit" class="btn btn-dark btn-lg w-100">
+                            Solicitar reserva
+                        </button>
+                        <p class="text-muted small mt-2 text-center">No se realiza ningún cobro ahora</p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+<script>
+    // Calendario de disponibilidad
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendario');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            locale: 'es',
+            initialView: 'dayGridMonth',
+            headerToolbar: {
+                left: 'prev',
+                center: 'title',
+                right: 'next'
+            },
+            events: '{{ url_for("reservas.api_disponibilidad", propiedad_id=propiedad.id) }}',
+            eventColor: '#dc3545',
+            eventDisplay: 'background',
+        });
+        calendar.render();
+    });
+
+    // Cálculo de precio estimado
+    var precioNoche = {{ propiedad.precio_noche }};
+    var fechaEntrada = document.getElementById('fecha_entrada');
+    var fechaSalida = document.getElementById('fecha_salida');
+
+    function calcularPrecio() {
+        if (fechaEntrada.value && fechaSalida.value) {
+            var entrada = new Date(fechaEntrada.value);
+            var salida = new Date(fechaSalida.value);
+            var noches = Math.ceil((salida - entrada) / (1000 * 60 * 60 * 24));
+            if (noches > 0) {
+                document.getElementById('num-noches').textContent = noches;
+                document.getElementById('precio-valor').textContent = (noches * precioNoche) + ' €';
+                document.getElementById('precio-estimado').style.display = 'block';
+            } else {
+                document.getElementById('precio-estimado').style.display = 'none';
+            }
+        }
+    }
+
+    fechaEntrada.addEventListener('change', calcularPrecio);
+    fechaSalida.addEventListener('change', calcularPrecio);
+</script>
+{% endblock %}

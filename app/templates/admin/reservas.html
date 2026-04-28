@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block titulo %}Gestión de reservas{% endblock %}
+
+{% block contenido %}
+<div class="container py-5">
+    <h1 class="mb-4">Reservas</h1>
+
+    <!-- Filtros -->
+    <div class="mb-4">
+        <a href="{{ url_for('admin.reservas', estado='todas') }}"
+           class="btn btn-sm {{ 'btn-dark' if estado_filtro == 'todas' else 'btn-outline-dark' }}">Todas</a>
+        <a href="{{ url_for('admin.reservas', estado='pendiente') }}"
+           class="btn btn-sm {{ 'btn-warning' if estado_filtro == 'pendiente' else 'btn-outline-warning' }}">Pendientes</a>
+        <a href="{{ url_for('admin.reservas', estado='confirmada') }}"
+           class="btn btn-sm {{ 'btn-success' if estado_filtro == 'confirmada' else 'btn-outline-success' }}">Confirmadas</a>
+        <a href="{{ url_for('admin.reservas', estado='cancelada') }}"
+           class="btn btn-sm {{ 'btn-danger' if estado_filtro == 'cancelada' else 'btn-outline-danger' }}">Canceladas</a>
+    </div>
+
+    {% if reservas %}
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Cliente</th>
+                <th>Propiedad</th>
+                <th>Entrada</th>
+                <th>Salida</th>
+                <th>Personas</th>
+                <th>Total</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in reservas %}
+            <tr>
+                <td>{{ r.id }}</td>
+                <td>
+                    {{ r.nombre_cliente }}<br>
+                    <small class="text-muted">{{ r.email_cliente }}</small>
+                </td>
+                <td>{{ r.propiedad.nombre }}</td>
+                <td>{{ r.fecha_entrada.strftime('%d/%m/%Y') }}</td>
+                <td>{{ r.fecha_salida.strftime('%d/%m/%Y') }}</td>
+                <td>{{ r.num_personas }}</td>
+                <td>{{ '%.2f' % r.precio_total }} &euro;</td>
+                <td>
+                    {% if r.estado == 'pendiente' %}
+                        <span class="badge bg-warning text-dark">Pendiente</span>
+                    {% elif r.estado == 'confirmada' %}
+                        <span class="badge bg-success">Confirmada</span>
+                    {% elif r.estado == 'pagada' %}
+                        <span class="badge bg-primary">Pagada</span>
+                    {% elif r.estado == 'cancelada' %}
+                        <span class="badge bg-danger">Cancelada</span>
+                    {% elif r.estado == 'completada' %}
+                        <span class="badge bg-secondary">Completada</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <form method="POST" action="{{ url_for('admin.cambiar_estado_reserva', reserva_id=r.id) }}" class="d-inline">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <select name="estado" class="form-select form-select-sm d-inline w-auto" onchange="this.form.submit()">
+                            <option value="">Cambiar...</option>
+                            <option value="confirmada">Confirmar</option>
+                            <option value="pagada">Marcar pagada</option>
+                            <option value="cancelada">Cancelar</option>
+                            <option value="completada">Completar</option>
+                        </select>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="text-muted">No hay reservas con este filtro.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block titulo %}Alojamientos - La Venta de las Estrellas{% endblock %}
+
+{% block contenido %}
+<div class="container py-5">
+    <h1 class="mb-4">Alojamientos</h1>
+
+    <!-- Casas -->
+    <h2 class="mb-3">Casas rurales</h2>
+    <p class="text-muted mb-4">Casas completas con cocina equipada, salón y todas las comodidades.</p>
+
+    <div class="row g-4 mb-5">
+        {% for casa in casas %}
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">{{ casa.nombre }}</h5>
+                    <p class="text-muted mb-1">
+                        <i class="bi bi-people"></i> Hasta {{ casa.capacidad }} personas
+                    </p>
+                    <p class="card-text mt-2">{{ casa.descripcion[:120] }}{% if casa.descripcion|length > 120 %}...{% endif %}</p>
+                    <p class="fw-bold fs-5">{{ '%.0f' % casa.precio_noche }} &euro;<small class="text-muted fw-normal">/noche</small></p>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="{{ url_for('propiedades.detalle', slug=casa.slug) }}" class="btn btn-outline-dark w-100">
+                        Ver detalles y reservar
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <p class="text-muted">No hay casas disponibles en este momento.</p>
+        {% endfor %}
+    </div>
+
+    <!-- Habitaciones -->
+    <h2 class="mb-3">Habitaciones</h2>
+    <p class="text-muted mb-4">Habitaciones con acceso a salón social. Sin cocina completa.</p>
+
+    <div class="row g-4">
+        {% for hab in habitaciones %}
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">{{ hab.nombre }}</h5>
+                    <p class="text-muted mb-1">
+                        <i class="bi bi-people"></i> {{ hab.capacidad }} personas
+                    </p>
+                    <p class="card-text mt-2">{{ hab.descripcion[:120] if hab.descripcion else '' }}</p>
+                    <p class="fw-bold fs-5">{{ '%.0f' % hab.precio_noche }} &euro;<small class="text-muted fw-normal">/noche</small></p>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="{{ url_for('propiedades.detalle', slug=hab.slug) }}" class="btn btn-outline-dark w-100">
+                        Ver detalles y reservar
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <p class="text-muted">No hay habitaciones disponibles en este momento.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

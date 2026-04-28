@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block titulo %}La Venta de las Estrellas - Casa Rural en Valdepeñas{% endblock %}
+
+{% block contenido %}
+<!-- Hero -->
+<section class="bg-dark text-white text-center py-5">
+    <div class="container py-5">
+        <h1 class="display-4 fw-bold">La Venta de las Estrellas</h1>
+        <p class="lead mt-3">Casa rural y enoturismo en el corazón de Valdepeñas</p>
+        <p class="text-muted">Alojamiento entre viñedos, catas de vino y eventos en la finca El Conuco</p>
+        <a href="{{ url_for('propiedades.listado') }}" class="btn btn-outline-light btn-lg mt-3">
+            Ver alojamientos
+        </a>
+    </div>
+</section>
+
+<!-- Alojamientos destacados -->
+<section class="container py-5">
+    <h2 class="text-center mb-4">Nuestras casas rurales</h2>
+    <div class="row g-4">
+        {% for casa in casas %}
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">{{ casa.nombre }}</h5>
+                    <p class="text-muted">
+                        <i class="bi bi-people"></i> Hasta {{ casa.capacidad }} personas
+                    </p>
+                    <p class="card-text">{{ casa.descripcion[:100] }}...</p>
+                    <p class="fw-bold">Desde {{ '%.0f' % casa.precio_noche }} &euro;/noche</p>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="{{ url_for('propiedades.detalle', slug=casa.slug) }}" class="btn btn-outline-dark w-100">
+                        Ver detalles
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12 text-center text-muted">
+            <p>Próximamente disponibles.</p>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Habitaciones -->
+{% if habitaciones %}
+<section class="bg-light py-5">
+    <div class="container">
+        <h2 class="text-center mb-4">Habitaciones</h2>
+        <div class="row g-4">
+            {% for hab in habitaciones %}
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ hab.nombre }}</h5>
+                        <p class="text-muted">
+                            <i class="bi bi-people"></i> {{ hab.capacidad }} personas
+                        </p>
+                        <p class="fw-bold">{{ '%.0f' % hab.precio_noche }} &euro;/noche</p>
+                        <a href="{{ url_for('propiedades.detalle', slug=hab.slug) }}" class="btn btn-outline-dark">
+                            Ver detalles
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Enoturismo -->
+<section class="container py-5">
+    <h2 class="text-center mb-4">Enoturismo</h2>
+    <div class="row align-items-center">
+        <div class="col-md-6">
+            <h3>Vive la experiencia del vino</h3>
+            <p>Visita La Bodega de las Estrellas, pasea por nuestros viñedos ecológicos y disfruta de catas guiadas todos los sábados y domingos.</p>
+            <ul>
+                <li>Cata de 5 vinos con 3 tapas</li>
+                <li>Visita a la bodega y viñedos</li>
+                <li>Duración: 1,5 - 2 horas</li>
+                <li>Precio reducido para alojados</li>
+            </ul>
+            <a href="{{ url_for('enoturismo.listado') }}" class="btn btn-dark">
+                Ver experiencias
+            </a>
+        </div>
+        <div class="col-md-6 text-center">
+            <i class="bi bi-cup-straw display-1 text-muted"></i>
+        </div>
+    </div>
+</section>
+
+<!-- Eventos -->
+<section class="bg-light py-5">
+    <div class="container text-center">
+        <h2 class="mb-4">Eventos y celebraciones</h2>
+        <p class="lead">3 salones con capacidad de 30 a 300 personas</p>
+        <p>Bodas, comuniones, reuniones de empresa y celebraciones en un entorno único.</p>
+        <a href="{{ url_for('eventos.salones') }}" class="btn btn-dark btn-lg mt-2">
+            Ver salones
+        </a>
+    </div>
+</section>
+
+<!-- Contacto rápido -->
+<section class="container py-5 text-center">
+    <h2 class="mb-3">¿Tienes dudas?</h2>
+    <p class="lead">Llámanos o escríbenos y te ayudamos a planificar tu estancia.</p>
+    <a href="tel:+34641116078" class="btn btn-outline-dark btn-lg me-2">
+        <i class="bi bi-telephone"></i> +34 641 116 078
+    </a>
+    <a href="{{ url_for('main.contacto') }}" class="btn btn-dark btn-lg">
+        <i class="bi bi-envelope"></i> Contactar
+    </a>
+</section>
+{% endblock %}

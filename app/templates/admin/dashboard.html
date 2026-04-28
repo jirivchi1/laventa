@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block titulo %}Panel de administración{% endblock %}
+
+{% block contenido %}
+<div class="container py-5">
+    <h1 class="mb-4">Panel de administración</h1>
+
+    <!-- Tarjetas resumen -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="card text-bg-warning">
+                <div class="card-body">
+                    <h5 class="card-title">Reservas pendientes</h5>
+                    <p class="display-4">{{ reservas_pendientes }}</p>
+                    <a href="{{ url_for('admin.reservas', estado='pendiente') }}" class="text-dark">Ver todas</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-bg-success">
+                <div class="card-body">
+                    <h5 class="card-title">Huéspedes hoy</h5>
+                    <p class="display-4">{{ reservas_hoy | length }}</p>
+                    <a href="{{ url_for('admin.reservas', estado='confirmada') }}" class="text-dark">Ver activas</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-bg-info">
+                <div class="card-body">
+                    <h5 class="card-title">Propiedades activas</h5>
+                    <p class="display-4">{{ total_propiedades }}</p>
+                    <a href="{{ url_for('admin.propiedades') }}" class="text-dark">Gestionar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Huéspedes actuales -->
+    {% if reservas_hoy %}
+    <h3>Huéspedes actuales</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Cliente</th>
+                <th>Propiedad</th>
+                <th>Entrada</th>
+                <th>Salida</th>
+                <th>Personas</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in reservas_hoy %}
+            <tr>
+                <td>{{ r.nombre_cliente }}</td>
+                <td>{{ r.propiedad.nombre }}</td>
+                <td>{{ r.fecha_entrada.strftime('%d/%m/%Y') }}</td>
+                <td>{{ r.fecha_salida.strftime('%d/%m/%Y') }}</td>
+                <td>{{ r.num_personas }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    <!-- Links rápidos -->
+    <div class="mt-4">
+        <a href="{{ url_for('admin.reservas') }}" class="btn btn-outline-dark me-2">Todas las reservas</a>
+        <a href="{{ url_for('admin.propiedades') }}" class="btn btn-outline-dark">Propiedades</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,27 @@
+/* Estilos propios - La Venta de las Estrellas */
+/* Bootstrap 5 se encarga de casi todo. Aquí solo ajustes específicos. */
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+/* Cards uniformes */
+.card {
+    border: 1px solid #dee2e6;
+    transition: box-shadow 0.2s;
+}
+
+.card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Footer siempre abajo */
+footer {
+    margin-top: auto;
+}

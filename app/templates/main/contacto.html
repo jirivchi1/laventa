@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block titulo %}Contacto - La Venta de las Estrellas{% endblock %}
+
+{% block contenido %}
+<div class="container py-5">
+    <h1 class="mb-4">Contacto</h1>
+
+    <div class="row g-4">
+        <!-- Formulario -->
+        <div class="col-md-7">
+            <form method="POST" action="{{ url_for('main.contacto') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <div class="mb-3">
+                    <label for="nombre" class="form-label">Nombre *</label>
+                    <input type="text" class="form-control" id="nombre" name="nombre" required>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="email" class="form-label">Email *</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="telefono" class="form-label">Teléfono</label>
+                        <input type="tel" class="form-control" id="telefono" name="telefono">
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="tipo_consulta" class="form-label">Tipo de consulta</label>
+                    <select class="form-select" id="tipo_consulta" name="tipo_consulta">
+                        <option value="general">Consulta general</option>
+                        <option value="alojamiento">Alojamiento</option>
+                        <option value="enoturismo">Enoturismo / Catas</option>
+                        <option value="eventos">Eventos / Salones</option>
+                        <option value="otro">Otro</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="mensaje" class="form-label">Mensaje *</label>
+                    <textarea class="form-control" id="mensaje" name="mensaje" rows="5" required></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-dark">Enviar mensaje</button>
+            </form>
+        </div>
+
+        <!-- Info lateral -->
+        <div class="col-md-5">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Información de contacto</h5>
+
+                    <p class="mb-2">
+                        <i class="bi bi-telephone"></i>
+                        <a href="tel:+34641116078">+34 641 116 078</a>
+                    </p>
+                    <p class="mb-2">
+                        <i class="bi bi-envelope"></i>
+                        <a href="mailto:info@laventadelasestrellas.com">info@laventadelasestrellas.com</a>
+                    </p>
+                    <p class="mb-2">
+                        <i class="bi bi-geo-alt"></i>
+                        Vía de servicio autovía A-4 km194<br>
+                        13300 Valdepeñas (Ciudad Real)
+                    </p>
+                    <p class="mb-0">
+                        <i class="bi bi-instagram"></i>
+                        <a href="https://www.instagram.com/laventadelasestrellas" target="_blank">@laventadelasestrellas</a>
+                    </p>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h5 class="card-title">Cómo llegar</h5>
+                    <p><strong>Desde Valdepeñas:</strong> Por la vía auxiliar desde la rotonda del cerro del ángel, sin entrar en la autovía.</p>
+                    <p><strong>Desde la A-4:</strong> Salida km 194 (desde Madrid) o km 193 (desde Andalucía).</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

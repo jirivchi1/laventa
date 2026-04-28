@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block titulo %}Gestión de propiedades{% endblock %}
+
+{% block contenido %}
+<div class="container py-5">
+    <h1 class="mb-4">Propiedades</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Tipo</th>
+                <th>Capacidad</th>
+                <th>Precio/noche</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in propiedades %}
+            <tr>
+                <td>{{ p.nombre }}</td>
+                <td>{{ p.tipo | capitalize }}</td>
+                <td>{{ p.capacidad }}</td>
+                <td>{{ '%.0f' % p.precio_noche }} &euro;</td>
+                <td>
+                    {% if p.activa %}
+                        <span class="badge bg-success">Activa</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Inactiva</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

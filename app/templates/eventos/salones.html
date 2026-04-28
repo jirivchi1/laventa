@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block titulo %}Salones para eventos - La Venta de las Estrellas{% endblock %}
+
+{% block contenido %}
+<div class="container py-5">
+    <h1 class="mb-2">Salones para eventos</h1>
+    <p class="lead text-muted mb-4">Celebra tu evento en un entorno único entre viñedos.</p>
+
+    <!-- Salones -->
+    <div class="row g-4 mb-5">
+        {% for salon in salones %}
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h4 class="card-title">{{ salon.nombre }}</h4>
+                    <p class="card-text">{{ salon.descripcion }}</p>
+                    <p class="fw-bold">
+                        <i class="bi bi-people"></i> Hasta {{ salon.capacidad }} personas
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Formulario de solicitud -->
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">Solicitar presupuesto</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('eventos.solicitar') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="nombre" class="form-label">Nombre *</label>
+                                <input type="text" class="form-control" id="nombre" name="nombre" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="email" class="form-label">Email *</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="telefono" class="form-label">Teléfono *</label>
+                                <input type="tel" class="form-control" id="telefono" name="telefono" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="salon" class="form-label">Salón preferido</label>
+                                <select class="form-select" id="salon" name="salon">
+                                    {% for salon in salones %}
+                                    <option value="{{ salon.id }}">{{ salon.nombre }} (hasta {{ salon.capacidad }} pers.)</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="tipo_evento" class="form-label">Tipo de evento</label>
+                                <select class="form-select" id="tipo_evento" name="tipo_evento">
+                                    <option value="boda">Boda</option>
+                                    <option value="comunion">Comunión</option>
+                                    <option value="cumpleanos">Cumpleaños</option>
+                                    <option value="empresa">Evento de empresa</option>
+                                    <option value="otro">Otro</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="fecha" class="form-label">Fecha aproximada</label>
+                                <input type="date" class="form-control" id="fecha" name="fecha">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="num_personas" class="form-label">N.º de personas</label>
+                                <input type="number" class="form-control" id="num_personas" name="num_personas" min="1">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="mensaje" class="form-label">Cuéntanos más sobre tu evento</label>
+                            <textarea class="form-control" id="mensaje" name="mensaje" rows="4"></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-dark btn-lg">Solicitar presupuesto</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block titulo %}La Venta de las Estrellas{% endblock %}</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- CSS propio -->
+    <link href="{{ url_for('static', filename='css/estilos.css') }}" rel="stylesheet">
+
+    {% block head_extra %}{% endblock %}
+</head>
+<body>
+    <!-- Navegación -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('main.inicio') }}">
+                <i class="bi bi-stars"></i> La Venta de las Estrellas
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.inicio') }}">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('propiedades.listado') }}">Alojamientos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('enoturismo.listado') }}">Enoturismo</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('eventos.salones') }}">Eventos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.contacto') }}">Contacto</a>
+                    </li>
+                    {% if current_user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle"></i> {{ current_user.nombre }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            {% if current_user.es_admin %}
+                            <li><a class="dropdown-item" href="{{ url_for('admin.dashboard') }}">
+                                <i class="bi bi-speedometer2"></i> Panel admin
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            {% endif %}
+                            <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">
+                                <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+                            </a></li>
+                        </ul>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mensajes flash -->
+    <div class="container mt-3">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Contenido principal -->
+    <main>
+        {% block contenido %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <h5>La Venta de las Estrellas</h5>
+                    <p class="text-muted">Casa rural y enoturismo en Valdepeñas, Ciudad Real.</p>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h5>Contacto</h5>
+                    <p class="text-muted mb-1">
+                        <i class="bi bi-telephone"></i> +34 641 116 078
+                    </p>
+                    <p class="text-muted mb-1">
+                        <i class="bi bi-envelope"></i> info@laventadelasestrellas.com
+                    </p>
+                    <p class="text-muted">
+                        <i class="bi bi-geo-alt"></i> A-4 km194, 13300 Valdepeñas
+                    </p>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h5>Síguenos</h5>
+                    <a href="https://www.instagram.com/laventadelasestrellas" class="text-muted me-3" target="_blank">
+                        <i class="bi bi-instagram fs-4"></i>
+                    </a>
+                </div>
+            </div>
+            <hr class="border-secondary">
+            <p class="text-muted text-center mb-0">&copy; {{ now().year if now is defined else '2026' }} La Venta de las Estrellas</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- JS propio -->
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+
+    {% block scripts_extra %}{% endblock %}
+</body>
+</html>
