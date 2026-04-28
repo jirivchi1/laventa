@@ -168,7 +168,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // =============================================
     var precioNoche = {{ propiedad.precio_noche }};
     var apiUrl = '{{ url_for("reservas.api_disponibilidad", propiedad_id=propiedad.id) }}';
-    var hoyStr = new Date().toISOString().split('T')[0];
+
+    // Formatear fecha a YYYY-MM-DD en hora local (evita desfase UTC)
+    function fechaToStr(date) {
+        var y = date.getFullYear();
+        var m = String(date.getMonth() + 1).padStart(2, '0');
+        var d = String(date.getDate()).padStart(2, '0');
+        return y + '-' + m + '-' + d;
+    }
+
+    var hoyStr = fechaToStr(new Date());
 
     // Elementos del DOM
     var inputEntrada = document.getElementById('fecha_entrada');
@@ -330,7 +339,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function obtenerCeldaDia(fecha) {
-        var str = fecha.toISOString().split('T')[0];
+        var str = fechaToStr(fecha);
         return document.querySelector('[data-date="' + str + '"]');
     }
 
