@@ -1,0 +1,45 @@
+{% extends "emails/base_email.html" %}
+
+{% block contenido %}
+<h2>Solicitud de presupuesto para evento</h2>
+
+<table class="datos">
+    <tr>
+        <td class="label">Nombre</td>
+        <td class="valor">{{ datos.nombre }}</td>
+    </tr>
+    <tr>
+        <td class="label">Email</td>
+        <td class="valor">{{ datos.email }}</td>
+    </tr>
+    <tr>
+        <td class="label">Telefono</td>
+        <td class="valor">{{ datos.telefono }}</td>
+    </tr>
+    <tr>
+        <td class="label">Salon</td>
+        <td class="valor">{{ datos.salon }}</td>
+    </tr>
+    <tr>
+        <td class="label">Tipo de evento</td>
+        <td class="valor">{{ datos.tipo_evento }}</td>
+    </tr>
+    {% if datos.fecha %}
+    <tr>
+        <td class="label">Fecha</td>
+        <td class="valor">{{ datos.fecha }}</td>
+    </tr>
+    {% endif %}
+    {% if datos.num_personas %}
+    <tr>
+        <td class="label">Personas</td>
+        <td class="valor">{{ datos.num_personas }}</td>
+    </tr>
+    {% endif %}
+</table>
+
+{% if datos.mensaje %}
+<p><strong>Mensaje:</strong></p>
+<p style="background: #f8f9fa; padding: 12px; border-radius: 4px;">{{ datos.mensaje }}</p>
+{% endif %}
+{% endblock %}

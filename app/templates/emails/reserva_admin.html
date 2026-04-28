@@ -1,0 +1,46 @@
+{% extends "emails/base_email.html" %}
+
+{% block contenido %}
+<h2>Nueva reserva #{{ reserva.id }}</h2>
+
+<table class="datos">
+    <tr>
+        <td class="label">Cliente</td>
+        <td class="valor">{{ reserva.nombre_cliente }}</td>
+    </tr>
+    <tr>
+        <td class="label">Email</td>
+        <td class="valor">{{ reserva.email_cliente }}</td>
+    </tr>
+    <tr>
+        <td class="label">Telefono</td>
+        <td class="valor">{{ reserva.telefono_cliente }}</td>
+    </tr>
+    <tr>
+        <td class="label">Alojamiento</td>
+        <td class="valor">{{ reserva.propiedad.nombre }}</td>
+    </tr>
+    <tr>
+        <td class="label">Entrada</td>
+        <td class="valor">{{ reserva.fecha_entrada.strftime('%d/%m/%Y') }}</td>
+    </tr>
+    <tr>
+        <td class="label">Salida</td>
+        <td class="valor">{{ reserva.fecha_salida.strftime('%d/%m/%Y') }}</td>
+    </tr>
+    <tr>
+        <td class="label">Noches</td>
+        <td class="valor">{{ reserva.num_noches }}</td>
+    </tr>
+    <tr>
+        <td class="label">Personas</td>
+        <td class="valor">{{ reserva.num_personas }}</td>
+    </tr>
+    <tr>
+        <td class="label">Precio total</td>
+        <td class="precio-total">{{ '%.2f' % reserva.precio_total }} EUR</td>
+    </tr>
+</table>
+
+<p>Accede al panel de administracion para gestionar esta reserva.</p>
+{% endblock %}

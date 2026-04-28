@@ -1,5 +1,7 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 
+from app.services.email_service import EmailService
+
 eventos_bp = Blueprint('eventos', __name__)
 
 SALONES = [
@@ -43,6 +45,6 @@ def solicitar():
         'mensaje': request.form.get('mensaje'),
     }
 
-    # TODO: enviar email al admin con la solicitud
+    EmailService.enviar_solicitud_evento(datos)
     flash('Solicitud de presupuesto enviada. Te contactaremos en menos de 24 horas.', 'success')
     return redirect(url_for('eventos.salones'))

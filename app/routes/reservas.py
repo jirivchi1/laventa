@@ -5,6 +5,7 @@ from app.extensions import db
 from app.models.propiedad import Propiedad
 from app.models.reserva import Reserva
 from app.services.reserva_service import ReservaService
+from app.services.email_service import EmailService
 
 reservas_bp = Blueprint('reservas', __name__)
 
@@ -47,8 +48,8 @@ def nueva(propiedad_id):
         db.session.add(reserva)
         db.session.commit()
 
-        # TODO: enviar email de confirmación
-        flash('Reserva creada correctamente. Te enviaremos un email de confirmación.', 'success')
+        EmailService.confirmar_reserva(reserva)
+        flash('Reserva creada correctamente. Te hemos enviado un email de confirmación.', 'success')
         return redirect(url_for('reservas.confirmacion', reserva_id=reserva.id))
 
     return render_template('reservas/nueva.html', propiedad=propiedad)

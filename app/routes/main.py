@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, flash, redirect, url_for
 
 from app.models.propiedad import Propiedad
 from app.models.experiencia import Experiencia
+from app.services.email_service import EmailService
 
 main_bp = Blueprint('main', __name__)
 
@@ -20,13 +21,15 @@ def inicio():
 @main_bp.route('/contacto', methods=['GET', 'POST'])
 def contacto():
     if request.method == 'POST':
-        nombre = request.form.get('nombre')
-        email = request.form.get('email')
-        telefono = request.form.get('telefono')
-        tipo_consulta = request.form.get('tipo_consulta')
-        mensaje = request.form.get('mensaje')
+        datos = {
+            'nombre': request.form.get('nombre'),
+            'email': request.form.get('email'),
+            'telefono': request.form.get('telefono'),
+            'tipo_consulta': request.form.get('tipo_consulta'),
+            'mensaje': request.form.get('mensaje'),
+        }
 
-        # TODO: enviar email con el servicio de email
+        EmailService.enviar_contacto(datos)
         flash('Mensaje enviado correctamente. Te responderemos pronto.', 'success')
         return redirect(url_for('main.contacto'))
 

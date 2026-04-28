@@ -1,0 +1,44 @@
+{% extends "emails/base_email.html" %}
+
+{% block contenido %}
+<h2>Reserva recibida</h2>
+
+<p>Hola {{ reserva.nombre_cliente }},</p>
+
+<p>Hemos recibido tu solicitud de reserva. A continuacion te dejamos los detalles:</p>
+
+<table class="datos">
+    <tr>
+        <td class="label">Referencia</td>
+        <td class="valor">#{{ reserva.id }}</td>
+    </tr>
+    <tr>
+        <td class="label">Alojamiento</td>
+        <td class="valor">{{ reserva.propiedad.nombre }}</td>
+    </tr>
+    <tr>
+        <td class="label">Entrada</td>
+        <td class="valor">{{ reserva.fecha_entrada.strftime('%d/%m/%Y') }}</td>
+    </tr>
+    <tr>
+        <td class="label">Salida</td>
+        <td class="valor">{{ reserva.fecha_salida.strftime('%d/%m/%Y') }}</td>
+    </tr>
+    <tr>
+        <td class="label">Noches</td>
+        <td class="valor">{{ reserva.num_noches }}</td>
+    </tr>
+    <tr>
+        <td class="label">Personas</td>
+        <td class="valor">{{ reserva.num_personas }}</td>
+    </tr>
+    <tr>
+        <td class="label">Precio total</td>
+        <td class="precio-total">{{ '%.2f' % reserva.precio_total }} EUR</td>
+    </tr>
+</table>
+
+<p>Te confirmaremos la disponibilidad en breve. Si tienes alguna duda, no dudes en contactarnos.</p>
+
+<p>Un saludo,<br><strong>La Venta de las Estrellas</strong></p>
+{% endblock %}

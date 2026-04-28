@@ -1,0 +1,29 @@
+{% extends "emails/base_email.html" %}
+
+{% block contenido %}
+<h2>Nuevo mensaje de contacto</h2>
+
+<table class="datos">
+    <tr>
+        <td class="label">Nombre</td>
+        <td class="valor">{{ datos.nombre }}</td>
+    </tr>
+    <tr>
+        <td class="label">Email</td>
+        <td class="valor">{{ datos.email }}</td>
+    </tr>
+    {% if datos.telefono %}
+    <tr>
+        <td class="label">Telefono</td>
+        <td class="valor">{{ datos.telefono }}</td>
+    </tr>
+    {% endif %}
+    <tr>
+        <td class="label">Tipo de consulta</td>
+        <td class="valor">{{ datos.tipo_consulta }}</td>
+    </tr>
+</table>
+
+<p><strong>Mensaje:</strong></p>
+<p style="background: #f8f9fa; padding: 12px; border-radius: 4px;">{{ datos.mensaje }}</p>
+{% endblock %}

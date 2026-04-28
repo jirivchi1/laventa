@@ -1,0 +1,32 @@
+{% extends "emails/base_email.html" %}
+
+{% block contenido %}
+<h2>Nueva reserva de experiencia</h2>
+
+<table class="datos">
+    <tr>
+        <td class="label">Experiencia</td>
+        <td class="valor">{{ reserva.experiencia.nombre }}</td>
+    </tr>
+    <tr>
+        <td class="label">Fecha</td>
+        <td class="valor">{{ reserva.fecha.strftime('%d/%m/%Y') }}</td>
+    </tr>
+    <tr>
+        <td class="label">Cliente</td>
+        <td class="valor">{{ reserva.nombre_cliente }}</td>
+    </tr>
+    <tr>
+        <td class="label">Email</td>
+        <td class="valor">{{ reserva.email_cliente }}</td>
+    </tr>
+    <tr>
+        <td class="label">Telefono</td>
+        <td class="valor">{{ reserva.telefono_cliente }}</td>
+    </tr>
+    <tr>
+        <td class="label">Personas</td>
+        <td class="valor">{{ reserva.num_personas }}</td>
+    </tr>
+</table>
+{% endblock %}

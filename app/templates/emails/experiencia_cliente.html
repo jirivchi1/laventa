@@ -1,0 +1,32 @@
+{% extends "emails/base_email.html" %}
+
+{% block contenido %}
+<h2>Reserva de experiencia recibida</h2>
+
+<p>Hola {{ reserva.nombre_cliente }},</p>
+
+<p>Hemos recibido tu reserva para la siguiente experiencia:</p>
+
+<table class="datos">
+    <tr>
+        <td class="label">Experiencia</td>
+        <td class="valor">{{ reserva.experiencia.nombre }}</td>
+    </tr>
+    <tr>
+        <td class="label">Fecha</td>
+        <td class="valor">{{ reserva.fecha.strftime('%d/%m/%Y') }}</td>
+    </tr>
+    <tr>
+        <td class="label">Personas</td>
+        <td class="valor">{{ reserva.num_personas }}</td>
+    </tr>
+    <tr>
+        <td class="label">Precio por persona</td>
+        <td class="valor">{{ '%.2f' % reserva.experiencia.precio }} EUR</td>
+    </tr>
+</table>
+
+<p>Te contactaremos para confirmar tu plaza. Se recomienda llegar 10 minutos antes de la hora de inicio.</p>
+
+<p>Un saludo,<br><strong>La Venta de las Estrellas</strong></p>
+{% endblock %}

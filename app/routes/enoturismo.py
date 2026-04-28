@@ -3,6 +3,7 @@ from datetime import datetime
 
 from app.extensions import db
 from app.models.experiencia import Experiencia, ReservaExperiencia
+from app.services.email_service import EmailService
 
 enoturismo_bp = Blueprint('enoturismo', __name__)
 
@@ -47,5 +48,6 @@ def reservar(experiencia_id):
     db.session.add(reserva)
     db.session.commit()
 
-    flash('Reserva de experiencia creada. Te contactaremos para confirmar.', 'success')
+    EmailService.confirmar_experiencia(reserva)
+    flash('Reserva de experiencia creada. Te hemos enviado un email de confirmación.', 'success')
     return redirect(url_for('enoturismo.listado'))

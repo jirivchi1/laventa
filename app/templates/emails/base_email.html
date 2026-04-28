@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; color: #333; margin: 0; padding: 0; background: #f5f5f5; }
+        .container { max-width: 600px; margin: 20px auto; background: #fff; border-radius: 8px; overflow: hidden; }
+        .header { background: #212529; color: #fff; padding: 24px; text-align: center; }
+        .header h1 { margin: 0; font-size: 22px; }
+        .body { padding: 24px; }
+        .body h2 { color: #212529; margin-top: 0; }
+        table.datos { width: 100%; border-collapse: collapse; margin: 16px 0; }
+        table.datos td { padding: 8px 12px; border-bottom: 1px solid #eee; }
+        table.datos td.label { color: #888; width: 40%; }
+        table.datos td.valor { font-weight: bold; }
+        .precio-total { font-size: 20px; color: #198754; font-weight: bold; }
+        .footer { background: #f8f9fa; padding: 16px 24px; font-size: 13px; color: #888; text-align: center; }
+        .footer a { color: #888; }
+        .btn { display: inline-block; padding: 12px 24px; background: #212529; color: #fff; text-decoration: none; border-radius: 6px; margin-top: 12px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>La Venta de las Estrellas</h1>
+        </div>
+        <div class="body">
+            {% block contenido %}{% endblock %}
+        </div>
+        <div class="footer">
+            <p>
+                La Venta de las Estrellas<br>
+                Via de servicio autovia A-4 km194, 13300 Valdepeñas (Ciudad Real)<br>
+                Tel: +34 641 116 078 | info@laventadelasestrellas.com
+            </p>
+        </div>
+    </div>
+</body>
+</html>
