@@ -3,8 +3,36 @@
 {% block titulo %}Reservar {{ propiedad.nombre }} - La Venta de las Estrellas{% endblock %}
 
 {% block head_extra %}
-<!-- FullCalendar para mostrar disponibilidad -->
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet">
+<style>
+    /* Día seleccionado como entrada */
+    .fc-day-selected-start {
+        background-color: #198754 !important;
+        color: white;
+    }
+    /* Rango seleccionado entre entrada y salida */
+    .fc-day-selected-range {
+        background-color: #d1e7dd !important;
+    }
+    /* Día seleccionado como salida */
+    .fc-day-selected-end {
+        background-color: #0f5132 !important;
+        color: white;
+    }
+    /* Días pasados */
+    .fc-day-past-date .fc-daygrid-day-frame {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+    /* Cursor pointer en días seleccionables */
+    .fc-daygrid-day:not(.fc-day-past-date) {
+        cursor: pointer;
+    }
+    /* Indicador de selección */
+    #seleccion-info {
+        transition: opacity 0.2s;
+    }
+</style>
 {% endblock %}
 
 {% block contenido %}
@@ -21,28 +49,48 @@
 
     <div class="row g-4">
         <!-- Calendario de disponibilidad -->
-        <div class="col-md-7">
-            <div class="card mb-4">
+        <div class="col-lg-7">
+            <div class="card mb-3">
                 <div class="card-header">
-                    <h5 class="mb-0">Disponibilidad</h5>
+                    <h5 class="mb-0">Selecciona tus fechas en el calendario</h5>
                 </div>
                 <div class="card-body">
                     <div id="calendario"></div>
-                    <p class="text-muted small mt-2">
-                        <span class="badge bg-danger">&nbsp;</span> Fechas ocupadas
-                    </p>
+
+                    <!-- Leyenda -->
+                    <div class="d-flex gap-3 mt-3 flex-wrap">
+                        <span class="d-flex align-items-center gap-1">
+                            <span class="badge" style="background-color: #dc3545;">&nbsp;&nbsp;</span>
+                            <small class="text-muted">Ocupado</small>
+                        </span>
+                        <span class="d-flex align-items-center gap-1">
+                            <span class="badge" style="background-color: #198754;">&nbsp;&nbsp;</span>
+                            <small class="text-muted">Entrada</small>
+                        </span>
+                        <span class="d-flex align-items-center gap-1">
+                            <span class="badge" style="background-color: #d1e7dd;">&nbsp;&nbsp;</span>
+                            <small class="text-muted">Tu estancia</small>
+                        </span>
+                        <span class="d-flex align-items-center gap-1">
+                            <span class="badge" style="background-color: #0f5132;">&nbsp;&nbsp;</span>
+                            <small class="text-muted">Salida</small>
+                        </span>
+                    </div>
+
+                    <!-- Estado de la selección -->
+                    <div id="seleccion-info" class="alert alert-info mt-3" style="display: none;"></div>
                 </div>
             </div>
         </div>
 
         <!-- Formulario de reserva -->
-        <div class="col-md-5">
+        <div class="col-lg-5">
             <div class="card sticky-top" style="top: 1rem;">
                 <div class="card-header">
                     <h5 class="mb-0">Datos de la reserva</h5>
                 </div>
                 <div class="card-body">
-                    <form method="POST" action="{{ url_for('reservas.nueva', propiedad_id=propiedad.id) }}">
+                    <form method="POST" action="{{ url_for('reservas.nueva', propiedad_id=propiedad.id) }}" id="form-reserva">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                         <div class="mb-3">
@@ -67,25 +115,38 @@
                             <div class="form-text">Máximo {{ propiedad.capacidad }} personas</div>
                         </div>
 
+                        <!-- Fechas (se rellenan desde el calendario) -->
                         <div class="row mb-3">
                             <div class="col-6">
                                 <label for="fecha_entrada" class="form-label">Entrada *</label>
-                                <input type="date" class="form-control" id="fecha_entrada" name="fecha_entrada" required>
+                                <input type="date" class="form-control" id="fecha_entrada" name="fecha_entrada"
+                                       min="{{ today }}" required readonly>
                             </div>
                             <div class="col-6">
                                 <label for="fecha_salida" class="form-label">Salida *</label>
-                                <input type="date" class="form-control" id="fecha_salida" name="fecha_salida" required>
+                                <input type="date" class="form-control" id="fecha_salida" name="fecha_salida"
+                                       min="{{ today }}" required readonly>
+                            </div>
+                        </div>
+                        <p class="text-muted small mt-n2 mb-3">
+                            <i class="bi bi-info-circle"></i> Selecciona las fechas en el calendario
+                        </p>
+
+                        <!-- Precio estimado -->
+                        <div class="alert alert-success" id="precio-estimado" style="display:none;">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong><span id="num-noches"></span> noches</strong>
+                                    <br>
+                                    <small class="text-muted"><span id="num-noches-2"></span> x {{ '%.0f' % propiedad.precio_noche }} &euro;/noche</small>
+                                </div>
+                                <div class="fs-4 fw-bold">
+                                    <span id="precio-valor"></span>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Precio estimado -->
-                        <div class="alert alert-light" id="precio-estimado" style="display:none;">
-                            <strong>Precio estimado:</strong>
-                            <span id="precio-valor"></span>
-                            (<span id="num-noches"></span> noches x {{ '%.0f' % propiedad.precio_noche }} &euro;)
-                        </div>
-
-                        <button type="submit" class="btn btn-dark btn-lg w-100">
+                        <button type="submit" class="btn btn-dark btn-lg w-100" id="btn-reservar" disabled>
                             Solicitar reserva
                         </button>
                         <p class="text-muted small mt-2 text-center">No se realiza ningún cobro ahora</p>
@@ -100,45 +161,231 @@
 {% block scripts_extra %}
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
 <script>
-    // Calendario de disponibilidad
-    document.addEventListener('DOMContentLoaded', function() {
-        var calendarEl = document.getElementById('calendario');
-        var calendar = new FullCalendar.Calendar(calendarEl, {
-            locale: 'es',
-            initialView: 'dayGridMonth',
-            headerToolbar: {
-                left: 'prev',
-                center: 'title',
-                right: 'next'
-            },
-            events: '{{ url_for("reservas.api_disponibilidad", propiedad_id=propiedad.id) }}',
-            eventColor: '#dc3545',
-            eventDisplay: 'background',
-        });
-        calendar.render();
-    });
+document.addEventListener('DOMContentLoaded', function() {
 
-    // Cálculo de precio estimado
+    // =============================================
+    // CONFIGURACIÓN
+    // =============================================
     var precioNoche = {{ propiedad.precio_noche }};
-    var fechaEntrada = document.getElementById('fecha_entrada');
-    var fechaSalida = document.getElementById('fecha_salida');
+    var apiUrl = '{{ url_for("reservas.api_disponibilidad", propiedad_id=propiedad.id) }}';
+    var hoyStr = new Date().toISOString().split('T')[0];
 
-    function calcularPrecio() {
-        if (fechaEntrada.value && fechaSalida.value) {
-            var entrada = new Date(fechaEntrada.value);
-            var salida = new Date(fechaSalida.value);
-            var noches = Math.ceil((salida - entrada) / (1000 * 60 * 60 * 24));
-            if (noches > 0) {
-                document.getElementById('num-noches').textContent = noches;
-                document.getElementById('precio-valor').textContent = (noches * precioNoche) + ' €';
-                document.getElementById('precio-estimado').style.display = 'block';
+    // Elementos del DOM
+    var inputEntrada = document.getElementById('fecha_entrada');
+    var inputSalida = document.getElementById('fecha_salida');
+    var precioEstimado = document.getElementById('precio-estimado');
+    var btnReservar = document.getElementById('btn-reservar');
+    var seleccionInfo = document.getElementById('seleccion-info');
+
+    // Estado de la selección
+    var fechaEntrada = null;
+    var fechaSalida = null;
+    var fechasOcupadas = [];  // Array de {start: Date, end: Date}
+
+    // =============================================
+    // CALENDARIO
+    // =============================================
+    var calendarEl = document.getElementById('calendario');
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        locale: 'es',
+        initialView: 'dayGridMonth',
+        height: 'auto',
+        fixedWeekCount: false,
+        headerToolbar: {
+            left: 'prev',
+            center: 'title',
+            right: 'next'
+        },
+        validRange: {
+            start: hoyStr
+        },
+        events: {
+            url: apiUrl,
+            success: function(data) {
+                // Guardar fechas ocupadas para validar selección
+                fechasOcupadas = data.map(function(e) {
+                    return {
+                        start: new Date(e.start + 'T00:00:00'),
+                        end: new Date(e.end + 'T00:00:00')
+                    };
+                });
+            }
+        },
+        dateClick: function(info) {
+            var clickedDate = info.date;
+            var clickedStr = info.dateStr;
+
+            // No permitir fechas pasadas
+            var hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+            if (clickedDate < hoy) return;
+
+            // No permitir clic en fecha ocupada
+            if (esFechaOcupada(clickedDate)) {
+                mostrarInfo('Esta fecha está ocupada. Selecciona otra.', 'warning');
+                return;
+            }
+
+            // Lógica de selección: primer clic = entrada, segundo = salida
+            if (!fechaEntrada || (fechaEntrada && fechaSalida)) {
+                // Empezar nueva selección
+                fechaEntrada = clickedDate;
+                fechaSalida = null;
+                inputEntrada.value = clickedStr;
+                inputSalida.value = '';
+                ocultarPrecio();
+                mostrarInfo('Entrada: <strong>' + formatearFecha(clickedDate) + '</strong>. Ahora selecciona la fecha de salida.', 'info');
             } else {
-                document.getElementById('precio-estimado').style.display = 'none';
+                // Seleccionar fecha de salida
+                if (clickedDate <= fechaEntrada) {
+                    // Si clica antes o mismo día que entrada, reiniciar con esta como entrada
+                    fechaEntrada = clickedDate;
+                    fechaSalida = null;
+                    inputEntrada.value = clickedStr;
+                    inputSalida.value = '';
+                    ocultarPrecio();
+                    mostrarInfo('Entrada: <strong>' + formatearFecha(clickedDate) + '</strong>. Ahora selecciona la fecha de salida.', 'info');
+                } else {
+                    // Verificar que no hay fechas ocupadas en medio
+                    if (hayOcupadosEntre(fechaEntrada, clickedDate)) {
+                        mostrarInfo('Hay fechas ocupadas en ese rango. Selecciona otras fechas.', 'warning');
+                        return;
+                    }
+                    fechaSalida = clickedDate;
+                    inputSalida.value = clickedStr;
+                    calcularPrecio();
+                    mostrarInfo(
+                        'Entrada: <strong>' + formatearFecha(fechaEntrada) + '</strong> — Salida: <strong>' + formatearFecha(fechaSalida) + '</strong>',
+                        'success'
+                    );
+                }
+            }
+            pintarSeleccion();
+        },
+        dayCellDidMount: function(info) {
+            // Marcar días pasados
+            var hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+            if (info.date < hoy) {
+                info.el.classList.add('fc-day-past-date');
+            }
+        },
+    });
+    calendar.render();
+
+    // =============================================
+    // FUNCIONES DE VALIDACIÓN
+    // =============================================
+
+    function esFechaOcupada(fecha) {
+        for (var i = 0; i < fechasOcupadas.length; i++) {
+            var o = fechasOcupadas[i];
+            if (fecha >= o.start && fecha < o.end) {
+                return true;
             }
         }
+        return false;
     }
 
-    fechaEntrada.addEventListener('change', calcularPrecio);
-    fechaSalida.addEventListener('change', calcularPrecio);
+    function hayOcupadosEntre(inicio, fin) {
+        // Comprobar día a día si hay alguno ocupado
+        var d = new Date(inicio);
+        while (d < fin) {
+            if (esFechaOcupada(d)) return true;
+            d.setDate(d.getDate() + 1);
+        }
+        return false;
+    }
+
+    // =============================================
+    // PINTAR SELECCIÓN EN EL CALENDARIO
+    // =============================================
+
+    function pintarSeleccion() {
+        // Limpiar clases previas
+        document.querySelectorAll('.fc-day-selected-start, .fc-day-selected-range, .fc-day-selected-end').forEach(function(el) {
+            el.classList.remove('fc-day-selected-start', 'fc-day-selected-range', 'fc-day-selected-end');
+        });
+
+        if (!fechaEntrada) return;
+
+        // Pintar día de entrada
+        var entradaEl = obtenerCeldaDia(fechaEntrada);
+        if (entradaEl) entradaEl.classList.add('fc-day-selected-start');
+
+        if (!fechaSalida) return;
+
+        // Pintar rango intermedio
+        var d = new Date(fechaEntrada);
+        d.setDate(d.getDate() + 1);
+        while (d < fechaSalida) {
+            var el = obtenerCeldaDia(d);
+            if (el) el.classList.add('fc-day-selected-range');
+            d.setDate(d.getDate() + 1);
+        }
+
+        // Pintar día de salida
+        var salidaEl = obtenerCeldaDia(fechaSalida);
+        if (salidaEl) salidaEl.classList.add('fc-day-selected-end');
+    }
+
+    function obtenerCeldaDia(fecha) {
+        var str = fecha.toISOString().split('T')[0];
+        return document.querySelector('[data-date="' + str + '"]');
+    }
+
+    // Repintar selección al cambiar de mes
+    calendar.on('datesSet', function() {
+        // Esperar a que el DOM se actualice
+        setTimeout(pintarSeleccion, 50);
+    });
+
+    // =============================================
+    // PRECIO Y UI
+    // =============================================
+
+    function calcularPrecio() {
+        if (fechaEntrada && fechaSalida) {
+            var diffMs = fechaSalida.getTime() - fechaEntrada.getTime();
+            var noches = Math.round(diffMs / (1000 * 60 * 60 * 24));
+            if (noches > 0) {
+                var total = noches * precioNoche;
+                document.getElementById('num-noches').textContent = noches;
+                document.getElementById('num-noches-2').textContent = noches;
+                document.getElementById('precio-valor').textContent = total + ' \u20ac';
+                precioEstimado.style.display = 'block';
+                btnReservar.disabled = false;
+                return;
+            }
+        }
+        ocultarPrecio();
+    }
+
+    function ocultarPrecio() {
+        precioEstimado.style.display = 'none';
+        btnReservar.disabled = true;
+    }
+
+    function mostrarInfo(html, tipo) {
+        seleccionInfo.innerHTML = html;
+        seleccionInfo.className = 'alert alert-' + tipo + ' mt-3';
+        seleccionInfo.style.display = 'block';
+    }
+
+    function formatearFecha(fecha) {
+        var dia = String(fecha.getDate()).padStart(2, '0');
+        var mes = String(fecha.getMonth() + 1).padStart(2, '0');
+        var anio = fecha.getFullYear();
+        return dia + '/' + mes + '/' + anio;
+    }
+
+    // Validar antes de enviar
+    document.getElementById('form-reserva').addEventListener('submit', function(e) {
+        if (!inputEntrada.value || !inputSalida.value) {
+            e.preventDefault();
+            mostrarInfo('Selecciona las fechas de entrada y salida en el calendario.', 'warning');
+        }
+    });
+});
 </script>
 {% endblock %}

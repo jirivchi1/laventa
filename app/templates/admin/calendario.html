@@ -1,0 +1,269 @@
+{% extends "base.html" %}
+
+{% block titulo %}Calendario de reservas - Admin{% endblock %}
+
+{% block head_extra %}
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet">
+<style>
+    /* Eventos más legibles */
+    .fc-event {
+        cursor: pointer;
+        padding: 2px 4px;
+        font-size: 0.85em;
+    }
+    /* Borde grueso para indicar estado */
+    .fc-event {
+        border-width: 3px;
+        border-left-width: 5px;
+    }
+    /* Modal info */
+    #detalle-propiedad { font-weight: bold; }
+</style>
+{% endblock %}
+
+{% block contenido %}
+<div class="container-fluid py-4 px-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">Calendario de reservas</h1>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-dark">
+            <i class="bi bi-arrow-left"></i> Volver al panel
+        </a>
+    </div>
+
+    <div class="row g-4">
+        <!-- Calendario -->
+        <div class="col-lg-9">
+            <div class="card">
+                <div class="card-body">
+                    <div id="admin-calendario"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel lateral: filtros y leyenda -->
+        <div class="col-lg-3">
+            <!-- Filtro por propiedad -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h6 class="mb-0">Filtrar por propiedad</h6>
+                </div>
+                <div class="card-body">
+                    <div class="form-check mb-2">
+                        <input class="form-check-input filtro-propiedad" type="radio"
+                               name="filtroPropiedad" id="filtro-todas" value="" checked>
+                        <label class="form-check-label" for="filtro-todas">
+                            Todas las propiedades
+                        </label>
+                    </div>
+                    {% for item in leyenda %}
+                    <div class="form-check mb-2">
+                        <input class="form-check-input filtro-propiedad" type="radio"
+                               name="filtroPropiedad" id="filtro-{{ item.id }}" value="{{ item.id }}">
+                        <label class="form-check-label d-flex align-items-center gap-2" for="filtro-{{ item.id }}">
+                            <span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:{{ item.color }};"></span>
+                            {{ item.nombre }}
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Leyenda de estados -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h6 class="mb-0">Estado (borde izquierdo)</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span style="display:inline-block; width:14px; height:14px; border-left:5px solid #ffc107; background:#f8f9fa;"></span>
+                        <small>Pendiente</small>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span style="display:inline-block; width:14px; height:14px; border-left:5px solid #198754; background:#f8f9fa;"></span>
+                        <small>Confirmada</small>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span style="display:inline-block; width:14px; height:14px; border-left:5px solid #0d6efd; background:#f8f9fa;"></span>
+                        <small>Pagada</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resumen rápido -->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">Accesos rápidos</h6>
+                </div>
+                <div class="card-body">
+                    <a href="{{ url_for('admin.reservas', estado='pendiente') }}" class="btn btn-outline-warning btn-sm w-100 mb-2">
+                        Reservas pendientes
+                    </a>
+                    <a href="{{ url_for('admin.reservas') }}" class="btn btn-outline-dark btn-sm w-100">
+                        Todas las reservas
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal detalle de reserva -->
+<div class="modal fade" id="modalReserva" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-titulo">Detalle de reserva</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-borderless mb-0">
+                    <tr>
+                        <td class="text-muted">Propiedad:</td>
+                        <td id="detalle-propiedad"></td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Cliente:</td>
+                        <td id="detalle-cliente"></td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Email:</td>
+                        <td id="detalle-email"></td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Teléfono:</td>
+                        <td id="detalle-telefono"></td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Entrada:</td>
+                        <td id="detalle-entrada"></td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Salida:</td>
+                        <td id="detalle-salida"></td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Noches:</td>
+                        <td id="detalle-noches"></td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Personas:</td>
+                        <td id="detalle-personas"></td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Estado:</td>
+                        <td id="detalle-estado"></td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Precio total:</td>
+                        <td id="detalle-precio" class="fw-bold fs-5"></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <a href="#" id="detalle-link-gestionar" class="btn btn-dark">
+                    Gestionar reservas
+                </a>
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    var apiUrl = '{{ url_for("admin.api_calendario") }}';
+    var urlReservas = '{{ url_for("admin.reservas") }}';
+
+    // =============================================
+    // CALENDARIO
+    // =============================================
+    var calendarEl = document.getElementById('admin-calendario');
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        locale: 'es',
+        initialView: 'dayGridMonth',
+        height: 'auto',
+        fixedWeekCount: false,
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,listMonth'
+        },
+        buttonText: {
+            today: 'Hoy',
+            month: 'Mes',
+            week: 'Semana',
+            list: 'Lista'
+        },
+        events: {
+            url: apiUrl,
+        },
+        eventClick: function(info) {
+            mostrarDetalle(info.event);
+        },
+        // Tooltip al pasar el ratón
+        eventDidMount: function(info) {
+            var props = info.event.extendedProps;
+            info.el.title = props.propiedad + ' | ' + props.cliente + ' | ' + props.estado;
+        },
+    });
+    calendar.render();
+
+    // =============================================
+    // FILTRO POR PROPIEDAD
+    // =============================================
+    document.querySelectorAll('.filtro-propiedad').forEach(function(radio) {
+        radio.addEventListener('change', function() {
+            var propiedadId = this.value;
+            var url = apiUrl;
+            if (propiedadId) {
+                url += '?propiedad_id=' + propiedadId;
+            }
+            calendar.removeAllEvents();
+            calendar.addEventSource({ url: url });
+        });
+    });
+
+    // =============================================
+    // MODAL DE DETALLE
+    // =============================================
+    var modal = new bootstrap.Modal(document.getElementById('modalReserva'));
+
+    var BADGES_ESTADO = {
+        'pendiente': '<span class="badge bg-warning text-dark">Pendiente</span>',
+        'confirmada': '<span class="badge bg-success">Confirmada</span>',
+        'pagada': '<span class="badge bg-primary">Pagada</span>',
+    };
+
+    function mostrarDetalle(event) {
+        var props = event.extendedProps;
+
+        document.getElementById('modal-titulo').textContent = 'Reserva #' + props.reserva_id;
+        document.getElementById('detalle-propiedad').textContent = props.propiedad;
+        document.getElementById('detalle-cliente').textContent = props.cliente;
+        document.getElementById('detalle-email').textContent = props.email;
+        document.getElementById('detalle-telefono').textContent = props.telefono;
+        document.getElementById('detalle-entrada').textContent = formatearFecha(event.start);
+        document.getElementById('detalle-salida').textContent = formatearFecha(event.end);
+        document.getElementById('detalle-noches').textContent = props.noches;
+        document.getElementById('detalle-personas').textContent = props.personas;
+        document.getElementById('detalle-estado').innerHTML = BADGES_ESTADO[props.estado] || props.estado;
+        document.getElementById('detalle-precio').textContent = props.precio.toFixed(2) + ' \u20ac';
+        document.getElementById('detalle-link-gestionar').href = urlReservas;
+
+        modal.show();
+    }
+
+    function formatearFecha(date) {
+        if (!date) return '-';
+        var d = String(date.getDate()).padStart(2, '0');
+        var m = String(date.getMonth() + 1).padStart(2, '0');
+        var y = date.getFullYear();
+        return d + '/' + m + '/' + y;
+    }
+});
+</script>
+{% endblock %}

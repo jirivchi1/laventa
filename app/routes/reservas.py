@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify
-from datetime import datetime
+from datetime import datetime, date
 
 from app.extensions import db
 from app.models.propiedad import Propiedad
@@ -23,6 +23,10 @@ def nueva(propiedad_id):
 
         if fecha_salida <= fecha_entrada:
             flash('La fecha de salida debe ser posterior a la de entrada.', 'danger')
+            return redirect(url_for('reservas.nueva', propiedad_id=propiedad_id))
+
+        if fecha_entrada < date.today():
+            flash('La fecha de entrada no puede ser anterior a hoy.', 'danger')
             return redirect(url_for('reservas.nueva', propiedad_id=propiedad_id))
 
         # Verificar disponibilidad
@@ -58,7 +62,7 @@ def confirmacion(reserva_id):
 
 @reservas_bp.route('/api/disponibilidad/<int:propiedad_id>')
 def api_disponibilidad(propiedad_id):
-    """Devuelve las fechas ocupadas para el calendario."""
+    """Devuelve las fechas ocupadas para el calendario público."""
     reservas = Reserva.query.filter(
         Reserva.propiedad_id == propiedad_id,
         Reserva.estado.in_(['confirmada', 'pagada', 'pendiente'])
@@ -69,6 +73,8 @@ def api_disponibilidad(propiedad_id):
         fechas_ocupadas.append({
             'start': r.fecha_entrada.isoformat(),
             'end': r.fecha_salida.isoformat(),
+            'display': 'background',
+            'color': '#dc3545',
         })
 
     return jsonify(fechas_ocupadas)
