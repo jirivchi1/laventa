@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block titulo %}Calendario semanal - Limpieza{% endblock %}
+
+{% block contenido %}
+<div class="container py-5">
+    <h1 class="mb-2"><i class="bi bi-calendar-week"></i> Calendario semanal</h1>
+    <p class="text-muted mb-4">
+        Semana del {{ inicio_semana.strftime('%d/%m/%Y') }} al {{ fin_semana.strftime('%d/%m/%Y') }}
+    </p>
+
+    <!-- Navegación semanas -->
+    <div class="mb-4">
+        <a href="{{ url_for('limpieza.calendario', semana=offset - 1) }}" class="btn btn-outline-dark btn-sm">
+            <i class="bi bi-arrow-left"></i> Semana anterior
+        </a>
+        <a href="{{ url_for('limpieza.calendario', semana=0) }}" class="btn btn-outline-dark btn-sm">
+            Esta semana
+        </a>
+        <a href="{{ url_for('limpieza.calendario', semana=offset + 1) }}" class="btn btn-outline-dark btn-sm">
+            Semana siguiente <i class="bi bi-arrow-right"></i>
+        </a>
+    </div>
+
+    <div class="row g-3">
+        {% for dia in dias %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card {% if dia.fecha == hoy %}border-primary{% endif %}">
+                <div class="card-header {% if dia.fecha == hoy %}bg-primary text-white{% else %}bg-light{% endif %}">
+                    <strong>{{ dia.fecha.strftime('%A %d/%m') }}</strong>
+                    {% if dia.fecha == hoy %}<span class="badge bg-light text-primary ms-2">Hoy</span>{% endif %}
+                </div>
+                <div class="card-body">
+                    {% if dia.salidas %}
+                    <p class="mb-1"><strong class="text-danger"><i class="bi bi-box-arrow-right"></i> Salidas:</strong></p>
+                    <ul class="list-unstyled ms-3 mb-2">
+                        {% for r in dia.salidas %}
+                        <li>
+                            {{ r.propiedad.nombre }} ({{ r.num_personas }}p)
+                            {% if r.estado_limpieza == 'pendiente' %}
+                                <span class="badge bg-warning text-dark">Pendiente</span>
+                            {% elif r.estado_limpieza == 'en_proceso' %}
+                                <span class="badge bg-info">En proceso</span>
+                            {% elif r.estado_limpieza == 'completada' %}
+                                <span class="badge bg-success">Listo</span>
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+
+                    {% if dia.entradas %}
+                    <p class="mb-1"><strong class="text-success"><i class="bi bi-box-arrow-in-right"></i> Entradas:</strong></p>
+                    <ul class="list-unstyled ms-3 mb-0">
+                        {% for r in dia.entradas %}
+                        <li>{{ r.propiedad.nombre }} ({{ r.num_personas }}p) - sale {{ r.fecha_salida.strftime('%d/%m') }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+
+                    {% if not dia.salidas and not dia.entradas %}
+                    <p class="text-muted mb-0">Sin movimientos</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="mt-4">
+        <a href="{{ url_for('limpieza.dashboard') }}" class="btn btn-outline-dark">
+            <i class="bi bi-arrow-left"></i> Volver al panel
+        </a>
+    </div>
+</div>
+{% endblock %}

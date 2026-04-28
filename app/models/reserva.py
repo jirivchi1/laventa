@@ -26,6 +26,10 @@ class Reserva(db.Model):
     precio_total = db.Column(db.Float)
     notas = db.Column(db.Text)
 
+    # Limpieza
+    estado_limpieza = db.Column(db.String(20), default='pendiente')
+    # Estados: pendiente, en_proceso, completada
+
     # Timestamps
     creada_en = db.Column(db.DateTime, default=datetime.utcnow)
 

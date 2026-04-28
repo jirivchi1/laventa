@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+
+{% block titulo %}Panel de limpieza{% endblock %}
+
+{% block contenido %}
+<div class="container py-5">
+    <h1 class="mb-4"><i class="bi bi-house-check"></i> Panel de limpieza</h1>
+    <p class="text-muted">{{ hoy.strftime('%A %d/%m/%Y') }}</p>
+
+    <!-- Resumen rápido -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <div class="card text-bg-danger">
+                <div class="card-body">
+                    <h5 class="card-title">Salidas hoy</h5>
+                    <p class="display-4">{{ salidas_hoy | length }}</p>
+                    <small>Necesitan limpieza</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-bg-success">
+                <div class="card-body">
+                    <h5 class="card-title">Entradas hoy</h5>
+                    <p class="display-4">{{ entradas_hoy | length }}</p>
+                    <small>Deben estar listas</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-bg-info">
+                <div class="card-body">
+                    <h5 class="card-title">Entradas mañana</h5>
+                    <p class="display-4">{{ entradas_manana | length }}</p>
+                    <small>Preparar con antelación</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-bg-warning">
+                <div class="card-body">
+                    <h5 class="card-title">Pendientes</h5>
+                    <p class="display-4">{{ pendientes | length }}</p>
+                    <small>Limpiezas sin completar</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Salidas de hoy (limpiar) -->
+    {% if salidas_hoy %}
+    <h3 class="mb-3"><i class="bi bi-box-arrow-right text-danger"></i> Salidas hoy - Limpiar</h3>
+    <div class="table-responsive mb-5">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Propiedad</th>
+                    <th>Personas</th>
+                    <th>Estancia</th>
+                    <th>Estado limpieza</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in salidas_hoy %}
+                <tr>
+                    <td><strong>{{ r.propiedad.nombre }}</strong></td>
+                    <td>{{ r.num_personas }} personas</td>
+                    <td>{{ r.fecha_entrada.strftime('%d/%m') }} - {{ r.fecha_salida.strftime('%d/%m') }} ({{ r.num_noches }} noches)</td>
+                    <td>
+                        {% if r.estado_limpieza == 'pendiente' %}
+                            <span class="badge bg-warning text-dark">Pendiente</span>
+                        {% elif r.estado_limpieza == 'en_proceso' %}
+                            <span class="badge bg-info">En proceso</span>
+                        {% elif r.estado_limpieza == 'completada' %}
+                            <span class="badge bg-success">Completada</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <form method="POST" action="{{ url_for('limpieza.cambiar_estado_limpieza', reserva_id=r.id) }}" class="d-inline">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            {% if r.estado_limpieza == 'pendiente' %}
+                                <button name="estado_limpieza" value="en_proceso" class="btn btn-sm btn-info">
+                                    <i class="bi bi-play-fill"></i> Empezar
+                                </button>
+                            {% elif r.estado_limpieza == 'en_proceso' %}
+                                <button name="estado_limpieza" value="completada" class="btn btn-sm btn-success">
+                                    <i class="bi bi-check-lg"></i> Completada
+                                </button>
+                            {% else %}
+                                <span class="text-success"><i class="bi bi-check-circle-fill"></i></span>
+                            {% endif %}
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <!-- Entradas de hoy -->
+    {% if entradas_hoy %}
+    <h3 class="mb-3"><i class="bi bi-box-arrow-in-right text-success"></i> Entradas hoy</h3>
+    <div class="table-responsive mb-5">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Propiedad</th>
+                    <th>Personas</th>
+                    <th>Salida prevista</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in entradas_hoy %}
+                <tr>
+                    <td><strong>{{ r.propiedad.nombre }}</strong></td>
+                    <td>{{ r.num_personas }} personas</td>
+                    <td>{{ r.fecha_salida.strftime('%d/%m/%Y') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <!-- Entradas de mañana -->
+    {% if entradas_manana %}
+    <h3 class="mb-3"><i class="bi bi-calendar-event text-info"></i> Entradas mañana</h3>
+    <div class="table-responsive mb-5">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Propiedad</th>
+                    <th>Personas</th>
+                    <th>Salida prevista</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in entradas_manana %}
+                <tr>
+                    <td><strong>{{ r.propiedad.nombre }}</strong></td>
+                    <td>{{ r.num_personas }} personas</td>
+                    <td>{{ r.fecha_salida.strftime('%d/%m/%Y') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <!-- Tareas pendientes acumuladas -->
+    {% if pendientes %}
+    <h3 class="mb-3"><i class="bi bi-exclamation-triangle text-warning"></i> Limpiezas pendientes</h3>
+    <div class="table-responsive mb-4">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Propiedad</th>
+                    <th>Salida</th>
+                    <th>Estado</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in pendientes %}
+                <tr>
+                    <td><strong>{{ r.propiedad.nombre }}</strong></td>
+                    <td>{{ r.fecha_salida.strftime('%d/%m/%Y') }}</td>
+                    <td>
+                        {% if r.estado_limpieza == 'pendiente' %}
+                            <span class="badge bg-warning text-dark">Pendiente</span>
+                        {% elif r.estado_limpieza == 'en_proceso' %}
+                            <span class="badge bg-info">En proceso</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <form method="POST" action="{{ url_for('limpieza.cambiar_estado_limpieza', reserva_id=r.id) }}" class="d-inline">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            {% if r.estado_limpieza == 'pendiente' %}
+                                <button name="estado_limpieza" value="en_proceso" class="btn btn-sm btn-info">
+                                    <i class="bi bi-play-fill"></i> Empezar
+                                </button>
+                            {% elif r.estado_limpieza == 'en_proceso' %}
+                                <button name="estado_limpieza" value="completada" class="btn btn-sm btn-success">
+                                    <i class="bi bi-check-lg"></i> Completada
+                                </button>
+                            {% endif %}
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <!-- Próximas estancias (próximos 30 días) -->
+    {% if proximas %}
+    <h3 class="mb-3"><i class="bi bi-calendar3 text-secondary"></i> Próximas estancias confirmadas</h3>
+    <p class="text-muted small">Reservas confirmadas en los próximos 30 días — para que puedas planificar.</p>
+    <div class="table-responsive mb-4">
+        <table class="table table-sm table-hover">
+            <thead>
+                <tr>
+                    <th>Propiedad</th>
+                    <th>Entrada</th>
+                    <th>Salida</th>
+                    <th>Personas</th>
+                    <th>Noches</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in proximas %}
+                <tr>
+                    <td><strong>{{ r.propiedad.nombre }}</strong></td>
+                    <td>{{ r.fecha_entrada.strftime('%d/%m/%Y') }}</td>
+                    <td>{{ r.fecha_salida.strftime('%d/%m/%Y') }}</td>
+                    <td>{{ r.num_personas }}</td>
+                    <td>{{ r.num_noches }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <!-- Aviso si no hay nada -->
+    {% if not salidas_hoy and not entradas_hoy and not entradas_manana and not pendientes and not proximas %}
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> No hay tareas ni reservas confirmadas pendientes en este momento.
+        <br><small>Las reservas aparecen aquí una vez que el administrador las confirma.</small>
+    </div>
+    {% endif %}
+
+    <!-- Links rápidos -->
+    <div class="mt-4">
+        <a href="{{ url_for('limpieza.tareas') }}" class="btn btn-outline-dark me-2">
+            <i class="bi bi-list-check"></i> Todas las tareas
+        </a>
+        <a href="{{ url_for('limpieza.calendario') }}" class="btn btn-outline-dark">
+            <i class="bi bi-calendar-week"></i> Calendario semanal
+        </a>
+    </div>
+</div>
+{% endblock %}

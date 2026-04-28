@@ -11,7 +11,15 @@ class Usuario(UserMixin, db.Model):
     nombre = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(256), nullable=False)
-    es_admin = db.Column(db.Boolean, default=False)
+    rol = db.Column(db.String(20), default='')  # 'admin', 'limpieza'
+
+    @property
+    def es_admin(self):
+        return self.rol == 'admin'
+
+    @property
+    def es_limpieza(self):
+        return self.rol == 'limpieza'
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -20,7 +28,7 @@ class Usuario(UserMixin, db.Model):
         return check_password_hash(self.password_hash, password)
 
     def __repr__(self):
-        return f'<Usuario {self.email}>'
+        return f'<Usuario {self.email} ({self.rol})>'
 
 
 @login_manager.user_loader

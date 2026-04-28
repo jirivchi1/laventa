@@ -19,11 +19,22 @@ with app.app_context():
         admin = Usuario(
             nombre='Administrador',
             email='admin@laventadelasestrellas.com',
-            es_admin=True,
+            rol='admin',
         )
         admin.set_password('admin123')  # CAMBIAR en producción
         db.session.add(admin)
         print('Usuario admin creado.')
+
+    # --- Usuario limpieza ---
+    if not Usuario.query.filter_by(email='limpieza@laventadelasestrellas.com').first():
+        limpieza = Usuario(
+            nombre='Equipo Limpieza',
+            email='limpieza@laventadelasestrellas.com',
+            rol='limpieza',
+        )
+        limpieza.set_password('limpieza123')  # CAMBIAR en producción
+        db.session.add(limpieza)
+        print('Usuario limpieza creado.')
 
     # --- Casas rurales ---
     casas = [

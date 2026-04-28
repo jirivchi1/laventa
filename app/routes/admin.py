@@ -103,6 +103,7 @@ def api_calendario():
                 'personas': r.num_personas,
                 'noches': r.num_noches,
                 'estado': r.estado,
+                'estado_limpieza': r.estado_limpieza,
                 'precio': r.precio_total,
             },
         })

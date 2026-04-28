@@ -154,6 +154,10 @@
                         <td id="detalle-estado"></td>
                     </tr>
                     <tr>
+                        <td class="text-muted">Limpieza:</td>
+                        <td id="detalle-limpieza"></td>
+                    </tr>
+                    <tr>
                         <td class="text-muted">Precio total:</td>
                         <td id="detalle-precio" class="fw-bold fs-5"></td>
                     </tr>
@@ -238,6 +242,12 @@ document.addEventListener('DOMContentLoaded', function() {
         'pagada': '<span class="badge bg-primary">Pagada</span>',
     };
 
+    var BADGES_LIMPIEZA = {
+        'pendiente': '<span class="badge bg-warning text-dark">Pendiente</span>',
+        'en_proceso': '<span class="badge bg-info">En proceso</span>',
+        'completada': '<span class="badge bg-success">Completada</span>',
+    };
+
     function mostrarDetalle(event) {
         var props = event.extendedProps;
 
@@ -251,6 +261,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('detalle-noches').textContent = props.noches;
         document.getElementById('detalle-personas').textContent = props.personas;
         document.getElementById('detalle-estado').innerHTML = BADGES_ESTADO[props.estado] || props.estado;
+        document.getElementById('detalle-limpieza').innerHTML = BADGES_LIMPIEZA[props.estado_limpieza] || props.estado_limpieza;
         document.getElementById('detalle-precio').textContent = props.precio.toFixed(2) + ' \u20ac';
         document.getElementById('detalle-link-gestionar').href = urlReservas;
 

@@ -30,6 +30,7 @@
                 <th>Personas</th>
                 <th>Total</th>
                 <th>Estado</th>
+                <th>Limpieza</th>
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -57,6 +58,15 @@
                         <span class="badge bg-danger">Cancelada</span>
                     {% elif r.estado == 'completada' %}
                         <span class="badge bg-secondary">Completada</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if r.estado_limpieza == 'pendiente' %}
+                        <span class="badge bg-warning text-dark">Pendiente</span>
+                    {% elif r.estado_limpieza == 'en_proceso' %}
+                        <span class="badge bg-info">En proceso</span>
+                    {% elif r.estado_limpieza == 'completada' %}
+                        <span class="badge bg-success">Completada</span>
                     {% endif %}
                 </td>
                 <td>
