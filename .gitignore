@@ -14,3 +14,5 @@ build/
 .claude/
 CLAUDE.md
 Isma.txt
+*.mp4
+*.MP4

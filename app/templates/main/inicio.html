@@ -3,12 +3,16 @@
 {% block titulo %}La Venta de las Estrellas - Casa Rural en Valdepeñas{% endblock %}
 
 {% block contenido %}
-<!-- Hero -->
-<section class="bg-dark text-white text-center py-5">
-    <div class="container py-5">
-        <h1 class="display-4 fw-bold">La Venta de las Estrellas</h1>
-        <p class="lead mt-3">Casa rural y enoturismo en el corazón de Valdepeñas</p>
-        <p class="text-muted">Alojamiento entre viñedos, catas de vino y eventos en la finca El Conuco</p>
+<!-- Hero con vídeo de fondo -->
+<section class="hero-video text-white text-center">
+    <video autoplay muted loop playsinline>
+        <source src="{{ url_for('static', filename='img/portada.mp4') }}" type="video/mp4">
+    </video>
+    <div class="hero-overlay"></div>
+    <div class="hero-content container py-5">
+        <h1 class="display-3 fw-bold">La Venta de las Estrellas</h1>
+        <p class="lead mt-3 fs-4">Casa rural y enoturismo en el corazón de Valdepeñas</p>
+        <p class="mt-2" style="color: rgba(255,255,255,0.7);">Alojamiento entre viñedos, catas de vino y eventos en la finca El Conuco</p>
         <a href="{{ url_for('propiedades.listado') }}" class="btn btn-outline-light btn-lg mt-3">
             Ver alojamientos
         </a>
@@ -72,10 +76,10 @@
 </section>
 {% endif %}
 
-<!-- Enoturismo -->
+<!-- Enoturismo: texto izquierda, vídeo derecha -->
 <section class="container py-5">
     <h2 class="text-center mb-4">Enoturismo</h2>
-    <div class="row align-items-center">
+    <div class="row align-items-center g-4">
         <div class="col-md-6">
             <h3>Vive la experiencia del vino</h3>
             <p>Visita La Bodega de las Estrellas, pasea por nuestros viñedos ecológicos y disfruta de catas guiadas todos los sábados y domingos.</p>
@@ -89,21 +93,67 @@
                 Ver experiencias
             </a>
         </div>
-        <div class="col-md-6 text-center">
-            <i class="bi bi-cup-straw display-1 text-muted"></i>
+        <div class="col-md-6">
+            <div class="video-seccion">
+                <video autoplay muted loop playsinline>
+                    <source src="{{ url_for('static', filename='img/viñedo.MP4') }}" type="video/mp4">
+                </video>
+            </div>
         </div>
     </div>
 </section>
 
-<!-- Eventos -->
+<!-- Espacios y eventos: vídeo izquierda, texto derecha -->
 <section class="bg-light py-5">
-    <div class="container text-center">
-        <h2 class="mb-4">Eventos y celebraciones</h2>
-        <p class="lead">3 salones con capacidad de 30 a 300 personas</p>
-        <p>Bodas, comuniones, reuniones de empresa y celebraciones en un entorno único.</p>
-        <a href="{{ url_for('eventos.salones') }}" class="btn btn-dark btn-lg mt-2">
-            Ver salones
-        </a>
+    <div class="container">
+        <h2 class="text-center mb-4">Espacios y eventos</h2>
+        <div class="row align-items-center g-4">
+            <div class="col-md-6">
+                <div class="video-seccion">
+                    <video autoplay muted loop playsinline>
+                        <source src="{{ url_for('static', filename='img/salon_web.MP4') }}" type="video/mp4">
+                    </video>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h3>Tu evento en un entorno único</h3>
+                <p>Disponemos de espacios para todo tipo de celebraciones, rodeados de viñedos y naturaleza.</p>
+                <ul>
+                    <li>3 salones con capacidad de 30 a 300 personas</li>
+                    <li>Zona deportiva: fútbol, voleibol, baloncesto</li>
+                    <li>Piscina con zona de sombra (verano)</li>
+                    <li>Jardín y espacios al aire libre</li>
+                </ul>
+                <a href="{{ url_for('eventos.salones') }}" class="btn btn-dark">
+                    Ver salones
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Recuerdos -->
+<section class="container py-5">
+    <h2 class="text-center mb-4">Recuerdos</h2>
+    <p class="text-center text-muted mb-4">Momentos vividos por nuestros visitantes en La Venta de las Estrellas.</p>
+    <div class="galeria-recuerdos">
+        <!-- Añadir aquí fotos y vídeos: copiar a app/static/img/recuerdos/ -->
+        <!-- Ejemplo foto:
+        <div class="galeria-item">
+            <img src="{{ url_for('static', filename='img/recuerdos/foto1.jpg') }}" alt="Evento en la finca">
+        </div>
+        -->
+        <!-- Ejemplo vídeo:
+        <div class="galeria-item">
+            <video autoplay muted loop playsinline>
+                <source src="{{ url_for('static', filename='img/recuerdos/video1.mp4') }}" type="video/mp4">
+            </video>
+        </div>
+        -->
+        <div class="text-center text-muted py-4" style="grid-column: 1 / -1;">
+            <i class="bi bi-camera fs-1"></i>
+            <p class="mt-2">Proximamente añadiremos fotos y vídeos de experiencias pasadas.</p>
+        </div>
     </div>
 </section>
 
